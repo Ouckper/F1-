@@ -1,0 +1,779 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>F1经典赛事详情</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --bg-primary: #0a0a0a;
+            --bg-secondary: #121212;
+            --text-primary: #ffffff;
+            --text-secondary: #a0a0a0;
+            --accent-red: #e10600;
+            --accent-red-dark: #b30500;
+            --gradient-red: linear-gradient(135deg, #e10600, #ff4444);
+            --gradient-dark: linear-gradient(135deg, #121212, #1a1a1a);
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: var(--bg-primary);
+            color: var(--text-primary);
+            overflow-x: hidden;
+            line-height: 1.6;
+        }
+
+        /* 导航栏 */
+        .navbar {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            padding: 1.5rem 5%;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            z-index: 100;
+            background: rgba(10, 10, 10, 0.9);
+            backdrop-filter: blur(20px);
+            border-bottom: 1px solid rgba(225, 6, 0, 0.2);
+        }
+
+        .logo {
+            font-family: 'Space Grotesk', sans-serif;
+            font-size: 1.8rem;
+            font-weight: 700;
+            background: var(--gradient-red);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            letter-spacing: -0.02em;
+            text-decoration: none;
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 2.5rem;
+            list-style: none;
+        }
+
+        .nav-links a {
+            color: var(--text-secondary);
+            text-decoration: none;
+            font-size: 0.95rem;
+            font-weight: 500;
+            transition: all 0.3s ease;
+            position: relative;
+        }
+
+        .nav-links a::after {
+            content: '';
+            position: absolute;
+            bottom: -5px;
+            left: 0;
+            width: 0;
+            height: 2px;
+            background: var(--accent-red);
+            transition: width 0.3s ease;
+        }
+
+        .nav-links a:hover {
+            color: var(--text-primary);
+        }
+
+        .nav-links a:hover::after {
+            width: 100%;
+        }
+
+        /* 详情区域 */
+        .detail-section {
+            padding: 8rem 5% 4rem;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .back-button {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            color: var(--text-secondary);
+            text-decoration: none;
+            font-size: 0.95rem;
+            margin-bottom: 2rem;
+            transition: color 0.3s ease;
+        }
+
+        .back-button:hover {
+            color: var(--accent-red);
+        }
+
+        .race-header {
+            margin-bottom: 3rem;
+        }
+
+        .race-year-badge {
+            display: inline-block;
+            padding: 0.5rem 1rem;
+            background: rgba(225, 6, 0, 0.1);
+            border: 1px solid rgba(225, 6, 0, 0.3);
+            border-radius: 20px;
+            font-size: 0.85rem;
+            color: var(--accent-red);
+            margin-bottom: 1rem;
+            font-weight: 500;
+            letter-spacing: 0.05em;
+        }
+
+        .race-title {
+            font-family: 'Space Grotesk', sans-serif;
+            font-size: clamp(2rem, 5vw, 3.5rem);
+            font-weight: 700;
+            margin-bottom: 1rem;
+            letter-spacing: -0.02em;
+        }
+
+        .race-location {
+            font-size: 1.2rem;
+            color: var(--text-secondary);
+        }
+
+        .race-image-container {
+            width: 100%;
+            margin-bottom: 3rem;
+            border-radius: 16px;
+            overflow: hidden;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .race-image {
+            width: 100%;
+            height: auto;
+            display: block;
+        }
+
+        /* 纪念风格样式 */
+        .race-image-container.memorial {
+            background: linear-gradient(135deg, #1a1a1a 0%, #0d0d0d 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-direction: column;
+            min-height: 300px;
+        }
+
+        .memorial-content {
+            text-align: center;
+            padding: 2rem;
+        }
+
+        .memorial-icon {
+            font-size: 4rem;
+            margin-bottom: 1rem;
+            opacity: 0.6;
+        }
+
+        .memorial-title {
+            font-family: 'Space Grotesk', sans-serif;
+            font-size: 1.5rem;
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+            color: var(--text-primary);
+        }
+
+        .memorial-name {
+            color: var(--text-secondary);
+            font-size: 1rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .memorial-quote {
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+            opacity: 0.7;
+            font-style: italic;
+        }
+
+        .race-content {
+            display: grid;
+            grid-template-columns: 2fr 1fr;
+            gap: 3rem;
+        }
+
+        @media (max-width: 768px) {
+            .race-content {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .race-description h2 {
+            font-family: 'Space Grotesk', sans-serif;
+            font-size: 1.8rem;
+            font-weight: 600;
+            margin-bottom: 1.5rem;
+            letter-spacing: -0.01em;
+        }
+
+        .race-description p {
+            color: var(--text-secondary);
+            line-height: 1.8;
+            margin-bottom: 1.5rem;
+            font-size: 1.1rem;
+        }
+
+        .race-sidebar {
+            display: flex;
+            flex-direction: column;
+            gap: 2rem;
+        }
+
+        .sidebar-card {
+            background: var(--gradient-dark);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            border-radius: 16px;
+            padding: 1.5rem;
+        }
+
+        .sidebar-card h3 {
+            font-family: 'Space Grotesk', sans-serif;
+            font-size: 1.2rem;
+            font-weight: 600;
+            margin-bottom: 1rem;
+            color: var(--accent-red);
+        }
+
+        .winner-card {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .winner-avatar {
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            background: var(--gradient-red);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            font-size: 1.4rem;
+        }
+
+        .winner-info h4 {
+            font-size: 1.1rem;
+            font-weight: 600;
+            margin-bottom: 0.2rem;
+        }
+
+        .winner-info p {
+            font-size: 0.9rem;
+            color: var(--text-secondary);
+        }
+
+        .highlights-list {
+            list-style: none;
+        }
+
+        .highlights-list li {
+            padding: 0.5rem 0;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+            display: flex;
+            align-items: flex-start;
+            gap: 0.5rem;
+        }
+
+        .highlights-list li:last-child {
+            border-bottom: none;
+        }
+
+        .highlight-icon {
+            color: var(--accent-red);
+            font-weight: bold;
+        }
+
+        .score-display {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .score-value {
+            font-family: 'Space Grotesk', sans-serif;
+            font-size: 3rem;
+            font-weight: 700;
+            background: var(--gradient-red);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .score-label {
+            font-size: 0.9rem;
+            color: var(--text-secondary);
+        }
+
+        /* 赛道进度条 */
+        .track-progress {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 4px;
+            background: rgba(255, 255, 255, 0.1);
+            z-index: 1000;
+        }
+
+        .track-progress-bar {
+            height: 100%;
+            background: var(--gradient-red);
+            width: 0%;
+            transition: width 0.1s ease;
+        }
+
+        /* 相关比赛 */
+        .related-races {
+            padding: 4rem 5%;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .related-title {
+            font-family: 'Space Grotesk', sans-serif;
+            font-size: 1.8rem;
+            font-weight: 600;
+            margin-bottom: 2rem;
+            letter-spacing: -0.01em;
+        }
+
+        .related-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 1.5rem;
+        }
+
+        .related-card {
+            background: var(--gradient-dark);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            border-radius: 12px;
+            padding: 1.5rem;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            color: inherit;
+        }
+
+        .related-card:hover {
+            transform: translateY(-5px);
+            border-color: rgba(225, 6, 0, 0.3);
+        }
+
+        .related-card-year {
+            font-family: 'Space Grotesk', sans-serif;
+            font-size: 2rem;
+            font-weight: 700;
+            color: rgba(225, 6, 0, 0.2);
+            margin-bottom: 0.5rem;
+        }
+
+        .related-card-title {
+            font-size: 1.1rem;
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+        }
+
+        .related-card-location {
+            font-size: 0.9rem;
+            color: var(--text-secondary);
+        }
+
+        /* 页脚 */
+        .footer {
+            padding: 4rem 5% 2rem;
+            border-top: 1px solid rgba(255, 255, 255, 0.05);
+            position: relative;
+            z-index: 2;
+        }
+
+        .footer-content {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 2rem;
+        }
+
+        .footer-logo {
+            font-family: 'Space Grotesk', sans-serif;
+            font-size: 1.5rem;
+            font-weight: 700;
+            background: var(--gradient-red);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .footer-links {
+            display: flex;
+            gap: 2rem;
+            list-style: none;
+        }
+
+        .footer-links a {
+            color: var(--text-secondary);
+            text-decoration: none;
+            font-size: 0.9rem;
+            transition: color 0.3s ease;
+        }
+
+        .footer-links a:hover {
+            color: var(--accent-red);
+        }
+
+        .footer-bottom {
+            text-align: center;
+            color: var(--text-secondary);
+            font-size: 0.85rem;
+        }
+    </style>
+</head>
+<body>
+    <!-- 赛道进度条 -->
+    <div class="track-progress">
+        <div class="track-progress-bar" id="progressBar"></div>
+    </div>
+    
+    <!-- 导航栏 -->
+    <nav class="navbar">
+        <a href="index.html" class="logo">F1 LEGENDS</a>
+        <ul class="nav-links">
+            <li><a href="index.html">经典赛事</a></li>
+            <li><a href="#about">关于</a></li>
+            <li><a href="#contact">联系</a></li>
+        </ul>
+    </nav>
+
+    <!-- 详情区域 -->
+    <section class="detail-section">
+        <a href="index.html" class="back-button">← 返回经典赛事列表</a>
+        
+        <div class="race-header">
+            <span class="race-year-badge" id="raceYear">1950</span>
+            <h1 class="race-title" id="raceTitle">英国大奖赛</h1>
+            <p class="race-location" id="raceLocation">银石赛道，英国</p>
+        </div>
+        
+        <div class="race-image-container">
+            <img src="images/1950-british-gp.jpg" alt="比赛图片" class="race-image" id="raceImage">
+        </div>
+        
+        <div class="race-content">
+            <div class="race-description">
+                <h2>比赛背景与意义</h2>
+                <p id="raceDescription">
+                    这是F1世界锦标赛的首场比赛，为七十余年的传奇历程奠定了基础。意大利车手法里纳驾驶阿尔法·罗密欧158赛车夺冠。
+                </p>
+            </div>
+            
+            <div class="race-sidebar">
+                <div class="sidebar-card">
+                    <h3>冠军信息</h3>
+                    <div class="winner-card">
+                        <div class="winner-avatar" id="winnerInitials">GF</div>
+                        <div class="winner-info">
+                            <h4 id="winnerName">朱塞佩·法里纳</h4>
+                            <p id="winnerTeam">阿尔法·罗密欧车队</p>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="sidebar-card">
+                    <h3>精彩亮点</h3>
+                    <ul class="highlights-list" id="highlightsList">
+                        <li><span class="highlight-icon">•</span> F1世界锦标赛首场比赛</li>
+                        <li><span class="highlight-icon">•</span> 英国国王乔治六世亲临现场</li>
+                        <li><span class="highlight-icon">•</span> 12万观众见证历史</li>
+                    </ul>
+                </div>
+                
+                <div class="sidebar-card">
+                    <h3>影响力评分</h3>
+                    <div class="score-display">
+                        <span class="score-value" id="scoreValue">10</span>
+                        <span class="score-label">/10</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- 相关比赛 -->
+    <section class="related-races">
+        <h2 class="related-title">相关经典赛事</h2>
+        <div class="related-grid" id="relatedGrid">
+            <!-- 相关比赛将通过JavaScript动态生成 -->
+        </div>
+    </section>
+
+    <!-- 页脚 -->
+    <footer class="footer">
+        <div class="footer-content">
+            <div class="footer-logo">F1 LEGENDS</div>
+            <ul class="footer-links">
+                <li><a href="index.html">经典赛事</a></li>
+                <li><a href="#about">关于</a></li>
+                <li><a href="#contact">联系</a></li>
+            </ul>
+        </div>
+        <div class="footer-bottom">
+            <p>© 2026 F1 Legends. 保留所有权利。</p>
+        </div>
+    </footer>
+
+    <script>
+        // 模拟比赛数据（实际使用时会从JSON文件加载）
+        const racesData = [
+            {
+                id: "1950-british-gp",
+                year: 1950,
+                name: "英国大奖赛",
+                circuit: "银石赛道",
+                country: "英国",
+                winner: "朱塞佩·法里纳",
+                team: "阿尔法·罗密欧",
+                highlights: ["F1世界锦标赛首场比赛", "英国国王乔治六世亲临现场", "12万观众见证历史"],
+                significance:'1950年5月13日，一个阳光明媚的春日，银石赛道迎来了改变赛车运动历史的时刻。这不是一场普通的比赛——这是F1世界锦标赛的首场正式比赛。清晨6点，观众们就陆续抵达这座曾经的军用机场，他们站在用稻草捆围成的赛道旁，等待见证一个新时代的诞生。英国国王乔治六世和伊丽莎白王后亲临现场，皇家包厢成为了这场比赛最尊贵的观赛席。当阿尔法·罗密欧158赛车的引擎轰鸣声划破宁静的天空时，12万观众沸腾了。意大利车手朱塞佩·法里纳以惊人的统治力领跑全场，他的队友法吉奥利和帕内尔紧随其后。最终，阿尔法·罗密欧包揽前三名，法里纳以2.5秒的优势夺冠。这场比赛不仅标志着F1七十余年传奇历程的开始，更奠定了赛车运动作为世界顶级体育赛事的地位。从那一天起，速度与激情的故事正式拉开序幕。',
+                score: 9.5,
+                image: "images/1950-british-gp.jpg"
+            },
+            {
+                id: "1957-german-gp",
+                year: 1957,
+                name: "德国大奖赛",
+                circuit: "纽伯格林赛道",
+                country: "德国",
+                winner: "胡安·曼努埃尔·方吉奥",
+                team: "玛莎拉蒂",
+                highlights: ["方吉奥最后5圈超越法拉利双雄", "创下最快圈速比排位赛快8秒", "方吉奥第5个世界冠军"],
+                significance:'这是F1历史上最伟大的个人表演，没有之一。46岁的胡安·曼努埃尔·方吉奥在22.8公里的纽伯格林北环赛道上，上演了一场令人窒息的绝地反击。比赛进行到第13圈时，方吉奥进站换胎出现了严重失误，他落后领先的法拉利双雄——迈克·霍桑和彼得·柯林斯——整整51秒。所有人都认为比赛已经结束，方吉奥的第五个世界冠军梦就此破碎。但这位阿根廷传奇车手做出了一个疯狂的决定：他开始用更高的档位过弯，冒着生命危险将赛车推向极限。“我在一个弯道用二档，下一个弯道就用三档；原本用三档的地方，我改用四档。”方吉奥后来回忆道。在最后10圈里，他每一圈都在刷新最快圈速纪录，9分17.4秒的单圈成绩比排位赛最快圈速还要快8秒！当他在最后一圈超越霍桑时，整个赛道都陷入了疯狂。方吉奥以3秒优势夺冠，赢得了他职业生涯的第24场胜利，也是最后一场胜利。赛后他坦言：“我从来没有这样疯狂地驾驶过，甚至把自己都吓到了。”这场比赛被永远铭记为“大师的杰作”，方吉奥用实际行动诠释了什么叫做永不言弃。',
+                score: 9.5,
+                image: "images/1957-german-gp.webp"
+            },
+            {
+                id: "1971-italian-gp",
+                year: 1971,
+                name: "意大利大奖赛",
+                circuit: "蒙扎赛道",
+                country: "意大利",
+                winner: "彼特·吉ethin",
+                team: "BRM",
+                highlights: ["F1历史上最接近的完赛成绩", "前五名在0.61秒内冲过终点", "极速竞争的极致体现"],
+                significance:'在F1七十余年的历史中，没有任何一场比赛能像1971年意大利大奖赛这样，将赛车运动的刺激与悬念推向极致。蒙扎赛道——这条以高速著称的传奇赛道——见证了一个至今无人打破的纪录：前五名车手在0.61秒内同时冲过终点线！这意味着什么？意味着当彼特·吉ethin驾驶BRM赛车第一个冲过终点时，他身后的杰基·斯图尔特、迈克·霍桑、克里斯·阿蒙和何塞·卡洛斯·帕克斯几乎与他同时抵达。0.61秒——比一次眨眼的时间还要短。这场比赛完美诠释了F1的精髓：当技术、策略和勇气达到完美平衡时，比赛可以精彩到令人窒息。没有明显的领先者，没有绝对的统治者，只有五位顶尖车手在300公里的极速对决中，为观众呈现了一场永载史册的经典之战。这场比赛证明了F1最迷人的地方不在于谁赢了，而在于比赛过程中的每一次超车、每一个弯道、每一次刹车点的选择都可能改变最终结果。',
+                score: 8.5,
+                image: "images/1971-italian-gp.webp"
+            },
+            {
+                id: "1976-japanese-gp",
+                year: 1976,
+                name: "日本大奖赛",
+                circuit: "铃鹿赛道",
+                country: "日本",
+                winner: "詹姆斯·亨特",
+                team: "迈凯伦",
+                highlights: ["亨特与劳达的冠军争夺战", "劳达因安全原因退赛", "亨特以1分优势夺冠"],
+                significance:'这是F1历史上最戏剧性的冠军争夺战，一场关于勇气、恐惧和命运的终极对决。1976赛季，英国车手詹姆斯·亨特与奥地利车手尼基·劳达展开了一场史诗般的较量。劳达在赛季中期经历了几乎致命的事故——他的法拉利赛车在纽伯格林赛道起火燃烧，他被严重烧伤，医生甚至担心他能否活过那个周末。但仅仅六周后，这位“章鱼”就奇迹般地复出参赛。当赛季来到日本铃鹿赛道的最后一站时，劳达领先亨特3分。比赛当天，大雨倾盆而下，赛道变成了一片汪洋。在这种能见度几乎为零的条件下，劳达做出了一个令所有人震惊的决定——他在第二圈后退赛。“我不想死在这里，”他平静地说道。亨特则选择继续战斗，他在雨中奋力拼搏，最终以第三名完赛，以一分优势赢得年度总冠军。这场比赛被改编成电影《极速风流》，成为赛车史上最动人的篇章之一。它告诉我们：有时候，最大的勇气不是继续战斗，而是知道何时该停下。',
+                score: 9.5,
+                image: "images/1976-japanese-gp.jpg"
+            },
+            {
+                id: "1979-french-gp",
+                year: 1979,
+                name: "法国大奖赛",
+                circuit: "迪戎赛道",
+                country: "法国",
+                winner: "吉尔·维伦纽夫",
+                team: "法拉利",
+                highlights: ["序列式变速箱首次亮相", "F1技术革命的开端", "彻底改变赛车驾驶方式"],
+                significance:'1979年法国大奖赛是F1技术史上的一个分水岭。在这场比赛中，法拉利车队做出了一个将永远改变赛车运动的决定：他们首次在比赛中使用了革命性的序列式变速箱。在此之前，F1赛车使用的是传统的手动变速箱，车手需要在高速过弯时双手离开方向盘来换挡，这既危险又低效。法拉利的工程师们开发了一套半自动系统，让车手只需用手指拨动方向盘后的拨片就能完成换挡。加拿大车手吉尔·维伦纽夫和队友吉尔·维伦纽夫驾驶着搭载这项新技术的法拉利640赛车，在迪戎赛道上向世界展示了F1的未来。维伦纽夫以惊人的速度领跑全场，他的换挡速度比使用传统变速箱的对手快了近一倍。这项技术很快被所有车队采用，从此F1赛车的驾驶方式发生了根本性变化。今天，我们看到的每一辆F1赛车都使用半自动变速箱，而这一切都始于1979年那个阳光明媚的下午。这场比赛不仅是一场胜利，更是F1进入科技新时代的宣言。',
+                score: 8.5,
+                image: "images/1979-french-gp.jpg"
+            },
+            {
+                id: "1982-monaco-gp",
+                year: 1982,
+                name: "摩纳哥大奖赛",
+                circuit: "蒙特卡洛赛道",
+                country: "摩纳哥",
+                winner: "阿兰·普罗斯特",
+                team: "雷诺",
+                highlights: ["领先集团接连出现问题", "普罗斯特意外获得首个冠军", "F1历史上最戏剧性的比赛之一"],
+                significance:'如果说F1有一条赛道最能体现命运的无常，那一定是蒙特卡洛。1982年摩纳哥大奖赛是赛车史上最疯狂、最不可预测的比赛之一，它完美诠释了什么叫做“不到最后一刻永远不知道谁会赢”。比赛最后几圈，领先的车手们像被诅咒了一样接连出现问题：帕劳斯·雷尼乌斯驾驶的莲花赛车在最后一圈燃油耗尽，他在距离终点线仅几百米的地方无奈停车；迪埃特·奎斯特在追逐领先者时撞墙退赛；小马里奥·安德雷蒂的阿尔法·罗密欧赛车遭遇机械故障。最终，当时还默默无闻的年轻法国车手阿兰·普罗斯特意外获得了他职业生涯的第一个分站冠军。普罗斯特赛后回忆说：“我简直不敢相信，我甚至不知道自己是怎么赢的。”这场比赛开启了普罗斯特辉煌职业生涯的序幕——他最终赢得了四个世界冠军头衔。摩纳哥再次证明了它的魔力：在这条狭窄、曲折的街道赛道上，任何事情都可能发生，而最疯狂的剧本往往就是现实。',
+                score: 9.0,
+                image: "images/1982-monaco-gp.webp"
+            },
+            {
+                id: "1993-european-gp",
+                year: 1993,
+                name: "欧洲大奖赛",
+                circuit: "多宁顿公园赛道",
+                country: "英国",
+                winner: "埃尔顿·塞纳",
+                team: "威廉姆斯",
+                highlights: ["塞纳神级一圈超越所有对手", "雨战大师的巅峰表现", "F1历史上最伟大的单圈之一"],
+                significance:'1993年4月11日，多宁顿公园赛道见证了一场将永远被铭记为“神之圈”的比赛。倾盆大雨中的埃尔顿·塞纳，驾驶着动力明显不足的迈凯伦赛车，在开场一圈内从第五位飙升至第一位——这个场景被解说员穆雷·沃克称为“他在水上行走”。当比赛开始时，塞纳的迈凯伦赛车排在第五位，前面是两辆强大的威廉姆斯-雷诺赛车、迈克尔·舒马赫的贝纳通和卡文·温德林格的索伯。但在雨中，塞纳仿佛变成了另一个人。在红土弯，他从内线超越舒马梅赫；在克兰纳弯道，他从外线超过温德林格；在麦克林弯，他追上了达蒙· hill；在科皮斯弯，他已经逼近普罗斯特；在墨尔本发夹弯，他完成了超越——一圈之内，五次超车，塞纳登顶领先位置。最终他以领先第二名达蒙· hill近一分钟的优势夺冠，这场比赛被公认为F1历史上最伟大的单圈表演。塞纳后来说：“在雨中，你必须完全信任自己的感觉。”他用实际行动证明了，真正的天才不是不受环境影响，而是能将恶劣环境转化为自己的优势。',
+                score: 9.5,
+                image: "images/1993-european-gp.webp"
+            },
+            {
+                id: "1994-san-marino-gp",
+                year: 1994,
+                name: "圣马力诺大奖赛",
+                circuit: "伊莫拉赛道",
+                country: "意大利",
+                winner: "迈克尔·舒马赫",
+                team: "贝纳通",
+                highlights: ["F1历史上最黑暗的周末", "塞纳在高速弯中丧生", "导致F1彻底的安全改革"],
+                significance:'1957年5月1日，F1历史上最黑暗的一天。伊莫拉赛道——这条见证了无数荣耀的传奇赛道——在这个周末变成了赛车运动的噩梦。周五练习赛，年轻的德国车手拉尔夫·舒马赫发生了严重撞车，虽然幸存但伤势严重。周六排位赛，奥地利车手奥洛弗·潘尼茨在高速弯中失控，赛车被撞成碎片，潘尼茨当场身亡。整个赛道笼罩在恐惧之中，但比赛仍然按计划进行。周日正赛第7圈，三届世界冠军、巴西传奇车手埃尔顿·塞纳在高速弯坦布雷洛弯失去了对威廉姆斯赛车的控制，以时速超过300公里的速度撞上了混凝土护墙。塞纳被送往医院，但因伤势过重不幸离世，年仅34岁。这场悲剧震惊了整个世界，也彻底改变了F1。此后，FIA进行了史上最彻底的安全改革：HANS头颈保护装置、碳纤维生存舱、赛道安全标准全面提升、赛车设计更注重碰撞保护。塞纳的去世是F1永远的伤痛，但他的精神遗产——对速度的极致追求、对完美的不懈坚持——将永远激励着后来者。这场悲剧换来了赛车运动的安全进步，让今天的车手能够在更安全的环境中追逐速度与梦想。',
+                score: 9.5,
+                image: null,
+                isMemorial: true
+            },
+            {
+                id: "2008-brazilian-gp",
+                year: 2008,
+                name: "巴西大奖赛",
+                circuit: "英特拉格斯赛道",
+                country: "巴西",
+                winner: "刘易斯·汉密尔顿",
+                team: "迈凯伦",
+                highlights: ["最后一圈超越格洛克夺冠", "汉密尔顿首个世界冠军", "F1历史上最戏剧性的冠军决定"],
+                significance:'英特拉格斯赛道，2008年11月2日。这一天，23岁的刘易斯·汉密尔顿在最后一圈的最后一刻，完成了F1历史上最不可思议的逆转。比赛开始时下着小雨，赛道湿滑。汉密尔顿的队友费利佩·马萨在主场观众的欢呼声中领跑，汉密尔顿需要获得第五名才能确保年度总冠军。但命运似乎在捉弄这位英国车手：在比赛最后阶段，他被塞巴斯蒂安·维特尔超越，跌至第六名——这意味着马萨将赢得世界冠军。当马萨冲过终点线时，法拉利维修区爆发出震耳欲聋的欢呼声，马萨的家人喜极而泣。但就在那一刻，汉密尔顿在最后一个弯道超越了使用干胎的丰田车手蒂莫·格洛克，升至第五名。电视转播画面捕捉到了马萨父亲脸上的笑容瞬间凝固——他刚刚还在庆祝儿子成为世界冠军，几秒钟后却发现冠军属于别人。汉密尔顿成为F1历史上最年轻的世界冠军，而这场比赛也被公认为F1历史上最戏剧性的冠军决定时刻。它告诉我们：在赛车运动中，比赛永远不会结束，直到最后一辆车冲过终点线。',
+                score: 9.5,
+                image: "images/2008-brazilian-gp.webp"
+            },
+            {
+                id: "2011-canadian-gp",
+                year: 2011,
+                name: "加拿大大奖赛",
+                circuit: "吉尔·维伦纽夫赛道",
+                country: "加拿大",
+                winner: "简森·巴顿",
+                team: "迈凯伦",
+                highlights: ["F1历史上用时最长的比赛", "因大雨中断近两小时", "巴顿6次进站后最后一圈夺冠"],
+                significance:'如果说有一场比赛能完美诠释F1的混乱与美丽，那一定是2011年加拿大大奖赛。这场比赛创造了多项F1纪录：它是历史上用时最长的比赛（超过4小时），因暴雨中断近两小时，简森·巴顿经历了6次进站、与队友刘易斯·汉密尔顿碰撞、被罚通过维修区——按照常理，这场比赛对他来说早已结束。但巴顿没有放弃。当比赛在中断两小时后重新开始时，他从最后一名开始疯狂追赶。在比赛最后几圈，赛道逐渐变干，巴顿的雨胎开始磨损，但他依然保持着惊人的速度。最后一圈，当他追上领先者塞巴斯蒂安·维特尔时，所有人都屏住了呼吸。维特尔在最后一个弯道打滑，巴顿抓住机会完成超越，以一种不可思议的方式赢得了胜利。赛后巴顿说：“这是我职业生涯中最疯狂的比赛，我从未经历过如此跌宕起伏的一天。”这场比赛完美诠释了F1的魅力：它不仅仅是速度的较量，更是意志、策略和运气的综合考验。在蒙特利尔的那个雨天，简森·巴顿向世界证明了，永不放弃的人最终会得到命运的眷顾。',
+                score: 9.0,
+                image: "images/2011-canadian-gp.webp"
+            },
+            {
+                id: "2016-malaysian-gp",
+                year: 2016,
+                name: "马来西亚大奖赛",
+                circuit: "雪邦赛道",
+                country: "马来西亚",
+                winner: "尼科·罗斯伯格",
+                team: "梅赛德斯",
+                highlights: ["汉密尔顿引擎爆缸退赛", "罗斯伯格赢得比赛", "极大影响最终冠军争夺"],
+                significance:'2016年马来西亚大奖赛是赛季的转折点，也是梅赛德斯车队内部斗争的高潮。刘易斯·汉密尔顿和尼科·罗斯伯格——这对队友兼死敌——在整个赛季中展开了一场激烈的内战。在雪邦赛道，汉密尔顿在领跑的情况下遭遇引擎爆缸，他的赛车在第4圈突然冒出浓烟，不得不无奈退赛。汉密尔顿愤怒地捶打着方向盘，他知道这场比赛的失利可能意味着年度冠军的丢失。与此同时，罗斯伯格抓住机会赢得比赛，将积分差距缩小到8分。这场比赛的戏剧性在于：汉密尔顿在领跑时爆缸，而他的竞争对手却轻松获胜——这种命运的捉弄让汉密尔顿倍感沮丧。赛季结束后，罗斯伯格以微弱优势战胜汉密尔顿赢得世界冠军，但他在夺冠后不久就宣布退役，震惊了整个赛车界。这场比赛成为2016赛季的转折点，它展示了F1中运气与技术同样重要——有时候，一场比赛的胜负不仅仅取决于车手的速度，还取决于赛车的可靠性。罗斯伯格的夺冠证明了：在F1中，坚持到最后一刻的人才是真正的胜利者。',
+                score: 8.5,
+                image: "images/2016-malaysian-gp.webp"
+            },
+            {
+                id: "2021-abu-dhabi-gp",
+                year: 2021,
+                name: "阿布扎比大奖赛",
+                circuit: "亚斯码头赛道",
+                country: "阿联酋",
+                winner: "马克斯·维斯塔潘",
+                team: "红牛",
+                highlights: ["最后一圈超越汉密尔顿夺冠", "安全车处理引发巨大争议", "维斯塔潘首个世界冠军"],
+                significance:'2021年12月12日，阿布扎比亚斯码头赛道见证了一场将永远被铭记为F1历史上最具争议的收官战。刘易斯·汉密尔顿和马克斯·维斯塔潘在整个赛季中展开了一场史诗般的较量，两人积分相同来到最后一站。比赛大部分时间里，汉密尔顿都牢牢掌控着领先优势，他看起来即将赢得创纪录的第八个世界冠军。但在第53圈，尼古拉斯·拉蒂菲撞车引发安全车出动，这改变了一切。赛事总监迈克尔·马西做出了一个将永远被讨论的决定：他允许维斯塔潘在安全车期间进站更换软胎，而汉密尔顿则留在了赛道上使用硬胎。更关键的是，马西只允许五辆慢车超越安全车，而不是按照规定允许所有被套圈的车辆超越。这导致在安全车收回后，维斯塔潘紧贴汉密尔顿身后，两人将在最后一圈进行一场决定世界冠军的对决。在最后一圈，维斯塔潘凭借软胎的巨大抓地力优势超越了汉密尔顿，赢得了他职业生涯的第一个世界冠军。梅赛德斯赛后提出抗议，但被驳回。FIA后来承认马西在安全车处理中存在“人为错误”，但比赛结果保持不变。这场比赛引发了全球范围的争议，它提醒我们：在F1中，规则、人为判断和运气有时会交织在一起，创造出最令人难忘（也最具争议）的时刻。',
+                score: 9.5,
+                image: "images/2021-abu-dhabi-gp.jpg"
+            }
+        ];
+
+        // 获取URL参数
+        const urlParams = new URLSearchParams(window.location.search);
+        const raceId = urlParams.get('id');
+
+        // 查找比赛数据
+        const race = racesData.find(r => r.id === raceId);
+
+        if (race) {
+            // 更新页面内容
+            document.getElementById('raceYear').textContent = race.year;
+            document.getElementById('raceTitle').textContent = race.name;
+            document.getElementById('raceLocation').textContent = `${race.circuit}，${race.country}`;
+            
+            // 处理图片 - 纪念性质的比赛显示特殊样式
+            const raceImageContainer = document.querySelector('.race-image-container');
+            const raceImage = document.getElementById('raceImage');
+            
+            if (race.isMemorial) {
+                // 纪念风格 - 深色背景 + 致敬文字
+                raceImageContainer.classList.add('memorial');
+                raceImage.style.display = 'none';
+                
+                // 创建纪念内容
+                const memorialDiv = document.createElement('div');
+                memorialDiv.className = 'memorial-content';
+                memorialDiv.innerHTML = `
+                    <div class="memorial-icon">🕯️</div>
+                    <h3 class="memorial-title">永远的车神</h3>
+                    <p class="memorial-name">埃尔顿·塞纳 (1960-1994)</p>
+                    <p class="memorial-quote">"如果我第一天就是世界冠军，那赛车就失去了意义"</p>
+                `;
+                raceImageContainer.appendChild(memorialDiv);
+            } else if (race.image) {
+                raceImage.src = race.image;
+                raceImage.alt = `${race.year}年${race.name}`;
+            }
+            
+            document.getElementById('raceDescription').textContent = race.significance;
+            document.getElementById('winnerInitials').textContent = race.winner.split(' ').map(n => n[0]).join('');
+            document.getElementById('winnerName').textContent = race.winner;
+            document.getElementById('winnerTeam').textContent = race.team;
+            document.getElementById('scoreValue').textContent = race.score;
+            
+            // 更新亮点列表
+            const highlightsList = document.getElementById('highlightsList');
+            highlightsList.innerHTML = '';
+            race.highlights.forEach(highlight => {
+                const li = document.createElement('li');
+                li.innerHTML = `<span class="highlight-icon">•</span> ${highlight}`;
+                highlightsList.appendChild(li);
+            });
+            
+            // 生成相关比赛
+            const relatedGrid = document.getElementById('relatedGrid');
+            const relatedRaces = racesData.filter(r => r.id !== race.id).slice(0, 3);
+            relatedRaces.forEach(relatedRace => {
+                const card = document.createElement('a');
+                card.href = `detail.html?id=${relatedRace.id}`;
+                card.className = 'related-card';
+                card.innerHTML = `
+                    <div class="related-card-year">${relatedRace.year}</div>
+                    <h3 class="related-card-title">${relatedRace.name}</h3>
+                    <p class="related-card-location">${relatedRace.circuit}，${relatedRace.country}</p>
+                `;
+                relatedGrid.appendChild(card);
+            });
+        }
+
+        // 赛道进度条
+        window.addEventListener('scroll', function() {
+            var scrollTop = document.documentElement.scrollTop || document.body.scrollTop;
+            var scrollHeight = document.documentElement.scrollHeight - document.documentElement.clientHeight;
+            var progress = (scrollTop / scrollHeight) * 100;
+            document.getElementById('progressBar').style.width = progress + '%';
+        });
+    </script>
+</body>
+</html>

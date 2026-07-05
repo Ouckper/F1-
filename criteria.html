@@ -1,0 +1,594 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>选拔规则 - F1经典赛事</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --bg-primary: #0a0a0a;
+            --bg-secondary: #121212;
+            --text-primary: #ffffff;
+            --text-secondary: #a0a0a0;
+            --accent-red: #e10600;
+            --gradient-red: linear-gradient(135deg, #e10600, #ff4444);
+            --gradient-dark: linear-gradient(135deg, #121212, #1a1a1a);
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: var(--bg-primary);
+            color: var(--text-primary);
+            overflow-x: hidden;
+            line-height: 1.6;
+        }
+
+        /* 格子旗图案 */
+        .checkered-flag {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-image: 
+                linear-gradient(45deg, #1a1a1a 25%, transparent 25%),
+                linear-gradient(-45deg, #1a1a1a 25%, transparent 25%),
+                linear-gradient(45deg, transparent 75%, #1a1a1a 75%),
+                linear-gradient(-45deg, transparent 75%, #1a1a1a 75%);
+            background-size: 20px 20px;
+            background-position: 0 0, 0 10px, 10px -10px, -10px 0px;
+            opacity: 0.03;
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        /* 导航栏 */
+        .navbar {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            padding: 1.5rem 5%;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            z-index: 100;
+            background: rgba(10, 10, 10, 0.9);
+            backdrop-filter: blur(20px);
+            border-bottom: 1px solid rgba(225, 6, 0, 0.2);
+        }
+
+        .logo {
+            font-family: 'Space Grotesk', sans-serif;
+            font-size: 1.8rem;
+            font-weight: 700;
+            background: var(--gradient-red);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            letter-spacing: -0.02em;
+            text-decoration: none;
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 2.5rem;
+            list-style: none;
+        }
+
+        .nav-links a {
+            color: var(--text-secondary);
+            text-decoration: none;
+            font-size: 0.95rem;
+            font-weight: 500;
+            transition: all 0.3s ease;
+            position: relative;
+        }
+
+        .nav-links a::after {
+            content: '';
+            position: absolute;
+            bottom: -5px;
+            left: 0;
+            width: 0;
+            height: 2px;
+            background: var(--accent-red);
+            transition: width 0.3s ease;
+        }
+
+        .nav-links a:hover {
+            color: var(--text-primary);
+        }
+
+        .nav-links a:hover::after {
+            width: 100%;
+        }
+
+        /* 主内容区 */
+        .main-content {
+            padding: 8rem 5% 4rem;
+            max-width: 1000px;
+            margin: 0 auto;
+            position: relative;
+            z-index: 2;
+        }
+
+        .back-button {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            color: var(--text-secondary);
+            text-decoration: none;
+            font-size: 0.95rem;
+            margin-bottom: 3rem;
+            transition: color 0.3s ease;
+        }
+
+        .back-button:hover {
+            color: var(--accent-red);
+        }
+
+        /* 页面标题 */
+        .page-header {
+            margin-bottom: 4rem;
+        }
+
+        .page-tag {
+            display: inline-block;
+            padding: 0.5rem 1rem;
+            background: rgba(225, 6, 0, 0.1);
+            border: 1px solid rgba(225, 6, 0, 0.3);
+            border-radius: 20px;
+            font-size: 0.85rem;
+            color: var(--accent-red);
+            margin-bottom: 1.5rem;
+            font-weight: 500;
+            letter-spacing: 0.05em;
+        }
+
+        .page-title {
+            font-family: 'Space Grotesk', sans-serif;
+            font-size: clamp(2.5rem, 5vw, 4rem);
+            font-weight: 700;
+            margin-bottom: 1.5rem;
+            letter-spacing: -0.03em;
+        }
+
+        .page-title .highlight {
+            background: var(--gradient-red);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .page-description {
+            font-size: 1.2rem;
+            color: var(--text-secondary);
+            max-width: 700px;
+            line-height: 1.8;
+        }
+
+        /* 选拔标准列表 */
+        .criteria-section {
+            margin-bottom: 4rem;
+        }
+
+        .criteria-list {
+            display: flex;
+            flex-direction: column;
+            gap: 1.5rem;
+        }
+
+        .criteria-item {
+            display: flex;
+            gap: 2rem;
+            padding: 2rem;
+            background: var(--gradient-dark);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            border-radius: 16px;
+            transition: all 0.3s ease;
+        }
+
+        .criteria-item:hover {
+            border-color: rgba(225, 6, 0, 0.2);
+            transform: translateX(10px);
+        }
+
+        .criteria-icon {
+            width: 70px;
+            height: 70px;
+            min-width: 70px;
+            background: rgba(225, 6, 0, 0.1);
+            border-radius: 14px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2rem;
+        }
+
+        .criteria-content {
+            flex: 1;
+        }
+
+        .criteria-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 0.5rem;
+        }
+
+        .criteria-name {
+            font-family: 'Space Grotesk', sans-serif;
+            font-size: 1.4rem;
+            font-weight: 600;
+            letter-spacing: -0.01em;
+        }
+
+        .criteria-score {
+            font-family: 'Space Grotesk', sans-serif;
+            font-size: 1.2rem;
+            font-weight: 700;
+            color: var(--accent-red);
+        }
+
+        .criteria-description {
+            color: var(--text-secondary);
+            line-height: 1.7;
+            margin-bottom: 1rem;
+        }
+
+        .criteria-examples {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+        }
+
+        .example-tag {
+            padding: 0.3rem 0.8rem;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 20px;
+            font-size: 0.8rem;
+            color: var(--text-secondary);
+        }
+
+        /* 评分说明 */
+        .scoring-section {
+            margin-bottom: 4rem;
+        }
+
+        .section-title {
+            font-family: 'Space Grotesk', sans-serif;
+            font-size: 1.8rem;
+            font-weight: 600;
+            margin-bottom: 2rem;
+            letter-spacing: -0.01em;
+        }
+
+        .scoring-card {
+            background: var(--gradient-dark);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            border-radius: 16px;
+            padding: 2rem;
+        }
+
+        .scoring-total {
+            display: flex;
+            align-items: center;
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+            padding-bottom: 2rem;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .total-value {
+            font-family: 'Space Grotesk', sans-serif;
+            font-size: 4rem;
+            font-weight: 700;
+            background: var(--gradient-red);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .total-label {
+            font-size: 1.1rem;
+            color: var(--text-secondary);
+            line-height: 1.6;
+        }
+
+        .scoring-breakdown {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1.5rem;
+        }
+
+        .breakdown-item {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .breakdown-score {
+            font-family: 'Space Grotesk', sans-serif;
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--accent-red);
+            min-width: 40px;
+        }
+
+        .breakdown-name {
+            color: var(--text-secondary);
+            font-size: 0.95rem;
+        }
+
+        /* 页脚 */
+        .footer {
+            padding: 4rem 5% 2rem;
+            border-top: 1px solid rgba(255, 255, 255, 0.05);
+            position: relative;
+            z-index: 2;
+        }
+
+        .footer-content {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 2rem;
+        }
+
+        .footer-logo {
+            font-family: 'Space Grotesk', sans-serif;
+            font-size: 1.5rem;
+            font-weight: 700;
+            background: var(--gradient-red);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .footer-links {
+            display: flex;
+            gap: 2rem;
+            list-style: none;
+        }
+
+        .footer-links a {
+            color: var(--text-secondary);
+            text-decoration: none;
+            font-size: 0.9rem;
+            transition: color 0.3s ease;
+        }
+
+        .footer-links a:hover {
+            color: var(--accent-red);
+        }
+
+        .footer-bottom {
+            text-align: center;
+            color: var(--text-secondary);
+            font-size: 0.85rem;
+        }
+
+        /* 响应式设计 */
+        @media (max-width: 768px) {
+            .nav-links {
+                display: none;
+            }
+
+            .criteria-item {
+                flex-direction: column;
+                gap: 1.5rem;
+            }
+
+            .criteria-icon {
+                width: 60px;
+                height: 60px;
+                min-width: 60px;
+            }
+
+            .criteria-header {
+                flex-direction: column;
+                gap: 0.5rem;
+            }
+
+            .scoring-total {
+                flex-direction: column;
+                text-align: center;
+            }
+
+            .footer-content {
+                flex-direction: column;
+                gap: 1.5rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="checkered-flag"></div>
+    
+    <!-- 导航栏 -->
+    <nav class="navbar">
+        <a href="index.html" class="logo">F1 LEGENDS</a>
+        <ul class="nav-links">
+            <li><a href="index.html">经典赛事</a></li>
+            <li><a href="criteria.html">选拔规则</a></li>
+        </ul>
+    </nav>
+
+    <!-- 主内容区 -->
+    <main class="main-content">
+        <a href="index.html" class="back-button">← 返回经典赛事列表</a>
+        
+        <div class="page-header">
+            <span class="page-tag">选拔标准</span>
+            <h1 class="page-title">如何定义<span class="highlight">最具影响力</span>的F1大奖赛</h1>
+            <p class="page-description">
+                我们通过五个核心维度来评估每场F1大奖赛的历史影响力。
+                每个维度都有明确的评分标准，最终得分将决定这场比赛是否能够入选我们的经典赛事榜单。
+            </p>
+        </div>
+
+        <!-- 选拔标准 -->
+        <section class="criteria-section">
+            <div class="criteria-list">
+                <div class="criteria-item">
+                    <div class="criteria-icon">🏆</div>
+                    <div class="criteria-content">
+                        <div class="criteria-header">
+                            <h3 class="criteria-name">历史开创性</h3>
+                            <span class="criteria-score">3分</span>
+                        </div>
+                        <p class="criteria-description">
+                            是否是F1历史上的首次事件、新规则的首次应用、或标志着重要转折点。
+                            这项标准衡量比赛在F1发展历程中的里程碑意义。
+                        </p>
+                        <div class="criteria-examples">
+                            <span class="example-tag">首届世界锦标赛比赛</span>
+                            <span class="example-tag">新规则首次应用</span>
+                            <span class="example-tag">重大技术革新</span>
+                            <span class="example-tag">历史性事件</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="criteria-item">
+                    <div class="criteria-icon">⚡</div>
+                    <div class="criteria-content">
+                        <div class="criteria-header">
+                            <h3 class="criteria-name">冠军争夺影响</h3>
+                            <span class="criteria-score">2.5分</span>
+                        </div>
+                        <p class="criteria-description">
+                            对当年或多年世界冠军争夺产生的决定性影响。
+                            这项标准评估比赛如何改变了年度冠军的走向或历史格局。
+                        </p>
+                        <div class="criteria-examples">
+                            <span class="example-tag">决定年度冠军归属</span>
+                            <span class="example-tag">改变多年冠军格局</span>
+                            <span class="example-tag">关键积分转折点</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="criteria-item">
+                    <div class="criteria-icon">🔥</div>
+                    <div class="criteria-content">
+                        <div class="criteria-header">
+                            <h3 class="criteria-name">戏剧性与悬念</h3>
+                            <span class="criteria-score">2分</span>
+                        </div>
+                        <p class="criteria-description">
+                            比赛过程的紧张程度、意外事件、最后时刻的逆转。
+                            这项标准关注比赛本身的观赏性和戏剧张力。
+                        </p>
+                        <div class="criteria-examples">
+                            <span class="example-tag">最后一圈逆转</span>
+                            <span class="example-tag">意外事故</span>
+                            <span class="example-tag">天气突变</span>
+                            <span class="example-tag">多次领跑交替</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="criteria-item">
+                    <div class="criteria-icon">🚗</div>
+                    <div class="criteria-content">
+                        <div class="criteria-header">
+                            <h3 class="criteria-name">技术革新</h3>
+                            <span class="criteria-score">1分</span>
+                        </div>
+                        <p class="criteria-description">
+                            推动赛车技术发展或改变F1技术格局。
+                            这项标准评估比赛在技术创新方面的贡献。
+                        </p>
+                        <div class="criteria-examples">
+                            <span class="example-tag">革命性赛车设计</span>
+                            <span class="example-tag">新技术首次应用</span>
+                            <span class="example-tag">性能突破</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="criteria-item">
+                    <div class="criteria-icon">📺</div>
+                    <div class="criteria-content">
+                        <div class="criteria-header">
+                            <h3 class="criteria-name">文化影响力</h3>
+                            <span class="criteria-score">0.5分</span>
+                        </div>
+                        <p class="criteria-description">
+                            对F1全球影响力、观众增长、电影艺术作品的影响。
+                            这项标准衡量比赛在体育文化层面的辐射效应。
+                        </p>
+                        <div class="criteria-examples">
+                            <span class="example-tag">推动F1全球化</span>
+                            <span class="example-tag">影视作品题材</span>
+                            <span class="example-tag">观众人数突破</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- 评分说明 -->
+        <section class="scoring-section">
+            <h2 class="section-title">评分体系</h2>
+            <div class="scoring-card">
+                <div class="scoring-total">
+                    <span class="total-value">10</span>
+                    <span class="total-label">
+                        满分10分<br>
+                        我们将每场比赛在五个维度上的得分相加，得出最终影响力评分。
+                    </span>
+                </div>
+                <div class="scoring-breakdown">
+                    <div class="breakdown-item">
+                        <span class="breakdown-score">3</span>
+                        <span class="breakdown-name">历史开创性</span>
+                    </div>
+                    <div class="breakdown-item">
+                        <span class="breakdown-score">2.5</span>
+                        <span class="breakdown-name">冠军争夺影响</span>
+                    </div>
+                    <div class="breakdown-item">
+                        <span class="breakdown-score">2</span>
+                        <span class="breakdown-name">戏剧性与悬念</span>
+                    </div>
+                    <div class="breakdown-item">
+                        <span class="breakdown-score">1</span>
+                        <span class="breakdown-name">技术革新</span>
+                    </div>
+                    <div class="breakdown-item">
+                        <span class="breakdown-score">0.5</span>
+                        <span class="breakdown-name">文化影响力</span>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <!-- 页脚 -->
+    <footer class="footer">
+        <div class="footer-content">
+            <div class="footer-logo">F1 LEGENDS</div>
+            <ul class="footer-links">
+                <li><a href="index.html">经典赛事</a></li>
+                <li><a href="criteria.html">选拔规则</a></li>
+            </ul>
+        </div>
+        <div class="footer-bottom">
+            <p>© 2026 F1 Legends. 保留所有权利。</p>
+        </div>
+    </footer>
+</body>
+</html>
