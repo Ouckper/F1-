@@ -62,8 +62,8 @@ F1/
 
 1. 克隆项目
    ```bash
-   git clone https://github.com/your-username/f1-greatest-races.git
-   cd f1-greatest-races
+   https://github.com/Ouckper/F1-.git
+   cd F1-
    ```
 
 2. 直接在浏览器中打开 `index.html`
